@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[test]]></title>
+  <title><![CDATA[hartley.io]]></title>
   <link href="http://benhartley.github.com/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-13T18:20:32+01:00</updated>
+  <updated>2012-04-14T08:38:44+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
