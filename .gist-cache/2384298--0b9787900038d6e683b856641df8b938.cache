@@ -1,0 +1,44 @@
+# you can define multiple backends using the following syntax:
+
+backend node {
+    .host = "127.0.0.1";
+    .port = "3000";
+}
+
+backend nginx {
+    .host = "127.0.0.1";
+    .port = "81";
+}
+
+
+# incoming traffic gets dealt with inside the following block
+
+sub vcl_recv {
+
+    # choose backend based on request
+    if (req.url ~ "\.(js|css|img)$") {
+        set req.backend = nginx;
+    } else {
+        set req.backend = node;
+    }
+
+    # pipe websocket connections directly to node app
+        if (req.http.Upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
+            return (pipe);
+    }
+
+}
+
+
+# outgoing traffic gets dealt with below
+
+sub vcl_pipe {
+
+    # copy the upgrade header so websocket connections get upgraded to 1.1
+    if (req.http.upgrade) {
+        set bereq.http.upgrade = req.http.upgrade;
+    }
+
+    return (pipe);
+
+}

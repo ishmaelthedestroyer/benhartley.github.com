@@ -4,7 +4,7 @@
   <title><![CDATA[Category: stunnel | hartley.io]]></title>
   <link href="http://benhartley.github.com/blog/categories/stunnel/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-15T16:14:32+01:00</updated>
+  <updated>2012-04-15T17:20:29+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using secure websockets (wss://) with nginx and varnish]]></title>
-    <link href="http://benhartley.github.com/blog/2012/04/14/using-socket-dot-io-with-secure-websockets-wss-slash-slash/"/>
+    <link href="http://benhartley.github.com/blog/2012/04/14/using-secure-websockets-wss-slash-slash-with-nginx-and-varnish/"/>
     <updated>2012-04-14T10:17:00+01:00</updated>
-    <id>http://benhartley.github.com/blog/2012/04/14/using-socket-dot-io-with-secure-websockets-wss-slash-slash</id>
+    <id>http://benhartley.github.com/blog/2012/04/14/using-secure-websockets-wss-slash-slash-with-nginx-and-varnish</id>
     <content type="html"><![CDATA[<p>How to get socket.io communicating over wss://<!-- more --></p>
 
 <h2>Preamble</h2>
@@ -67,17 +67,19 @@
 
 <p>You then need to edit the stunnel config file, which is at /etc/stunnel/stunnel.conf:</p>
 
-<pre><code>cert = /path/to/your.crt
-key = /path/to/your.key
+<p>``` bash /etc/stunnel/stunnel.conf</p>
 
-debug = 5
-output = /var/log/stunnel/stunnel.log
+<p>cert = /path/to/your.crt
+key = /path/to/your.key</p>
 
-[https]
+<p>debug = 5
+output = /var/log/stunnel/stunnel.log</p>
+
+<p>[https]
 accept = 443
 connect = 80
 TIMEOUTclose = 0
-</code></pre>
+```</p>
 
 <p>Then launch stunnel:</p>
 
@@ -93,9 +95,7 @@ TIMEOUTclose = 0
 
 <p>I'm not going to get into <a href="https://www.varnish-cache.org/docs/3.0/tutorial/">configuring varnish</a> in too much depth here since it's a big subject. Here is a simplified version of the relevant parts of my config file though (/etc/varnish/default.vcl):</p>
 
-<p>{% gist 2384298 %}</p>
-
-<p>``` shell /etc/varnish/default.vcl</p>
+<p>``` bash /etc/varnish/default.vcl</p>
 
 <h1>you can define multiple backends using the following syntax:</h1>
 
@@ -168,30 +168,38 @@ return (pipe);
 
 <p>Varnish is set up to pass requests for uncached static files through to nginx (listening on port 81) so it can serve them directly (it's insanely fast at doing this), but there are times when it may not be able to handle a request it is passed. For these requests, you can set your node app up to be an upstream server, so for anything nginx can't handle, it can just pass through to node. You can configure this in /etc/nginx/conf.d/default.conf:</p>
 
-<pre><code>upstream node {
-    server 127.0.0.1:3000;
+<p>``` nginx /etc/nginx/conf.d/default.conf</p>
+
+<p>upstream node {</p>
+
+<pre><code>server 127.0.0.1:3000;
+</code></pre>
+
+<p>}</p>
+
+<p>server {</p>
+
+<pre><code>listen *:81;
+server_name example.com;
+root /srv/www/example.com;
+error_log /var/log/nginx/example.com/error.log info;
+access_log /var/log/nginx/example.com/access.log main;
+
+location = / {
+    proxy_pass http://node;
 }
 
-server {
-    listen *:81;
-    server_name example.com;
-    root /srv/www/example.com;
-    error_log /var/log/nginx/example.com/error.log info;
-    access_log /var/log/nginx/example.com/access.log main;
+location / {
+    try_files $uri $uri/ @proxy;
+}
 
-    location = / {
-        proxy_pass http://node;
-    }
-
-    location / {
-        try_files $uri $uri/ @proxy;
-    }
-
-    location @proxy{
-        proxy_pass http://node;
-    }
+location @proxy{
+    proxy_pass http://node;
 }
 </code></pre>
+
+<p>}
+```</p>
 
 <p>You can then start nginx using:</p>
 

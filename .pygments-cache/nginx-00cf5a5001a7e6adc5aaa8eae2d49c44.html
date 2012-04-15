@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="k">upstream</span> <span class="s">node</span> <span class="p">{</span>
+	<span class="kn">server</span> <span class="n">127.0.0.1</span><span class="p">:</span><span class="mi">3000</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+	<span class="kn">listen</span> <span class="s">*:81</span><span class="p">;</span>
+	<span class="kn">server_name</span> <span class="s">example.com</span><span class="p">;</span>
+	<span class="kn">root</span> <span class="s">/srv/www/example.com</span><span class="p">;</span>
+	<span class="kn">error_log</span> <span class="s">/var/log/nginx/example.com/error.log</span> <span class="s">info</span><span class="p">;</span>
+	<span class="kn">access_log</span> <span class="s">/var/log/nginx/example.com/access.log</span> <span class="s">main</span><span class="p">;</span>
+														
+	<span class="kn">location</span> <span class="p">=</span> <span class="s">/</span> <span class="p">{</span>
+		<span class="kn">proxy_pass</span> <span class="s">http://node</span><span class="p">;</span>
+	<span class="p">}</span>
+																						
+	<span class="kn">location</span> <span class="s">/</span> <span class="p">{</span>
+		<span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">@proxy</span><span class="p">;</span>
+	<span class="p">}</span>
+				
+	<span class="kn">location</span> <span class="s">@proxy</span><span class="p">{</span>
+		<span class="kn">proxy_pass</span> <span class="s">http://node</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</pre>
+</div>
