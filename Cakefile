@@ -13,6 +13,7 @@ log = (message, color) ->
 	console.log ansi[color] + message + ansi.reset
 
 option '-m', '--message [COMMIT_MESSAGE]', 'set git commit message'
+option '-t', '--title [POST / PAGE TITLE]', 'set title for new page / post'
 
 task 'save', 'commit source then generate and deploy site', (options) ->
 	message = options.message || 'minor change'
@@ -30,3 +31,11 @@ task 'save', 'commit source then generate and deploy site', (options) ->
 					log stdout + stderr, 'light_grey'
 					err && throw err
 					log 'Save OK!', 'green'
+
+###
+task 'post', 'create new post', (options) ->
+	exec 'bundle exec rake new_post["' + options.title + '"]', (err, stdout, stderr) ->
+		log stdout + stderr, 'light_grey'
+		err && throw err
+		log 'Post created!', 'green'
+
