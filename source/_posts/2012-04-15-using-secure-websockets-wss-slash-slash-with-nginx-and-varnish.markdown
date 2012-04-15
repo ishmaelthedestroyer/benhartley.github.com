@@ -4,6 +4,7 @@ title: "Using secure websockets (wss://) with nginx and varnish"
 date: 2012-04-14 10:17
 comments: true
 categories:  [socket.io, stunnel, nginx, node, varnish]
+published: false
 ---
 
 How to get socket.io communicating over wss://<!-- more -->
