@@ -23,14 +23,17 @@ task 'save', 'commit source then generate and deploy site', (options) ->
 		exec 'git commit -m "' + message + '"', (err, stdout, stderr) ->
 			log stdout + stderr, 'light_grey'
 			err && log err, 'red'
-			# below use 'bundle exec rake...' due to version mismatch
-			exec 'bundle exec rake generate', (err, stdout, stderr) ->
+			exec 'git push origin source', (err, stdout, stderr) ->
 				log stdout + stderr, 'light_grey'
-				err && throw err
-				exec 'bundle exec rake deploy', (err, stdout, stderr) ->
+				err && log err, 'red'
+				# below use 'bundle exec rake...' due to version mismatch
+				exec 'bundle exec rake generate', (err, stdout, stderr) ->
 					log stdout + stderr, 'light_grey'
 					err && throw err
-					log 'Save OK!', 'green'
+					exec 'bundle exec rake deploy', (err, stdout, stderr) ->
+						log stdout + stderr, 'light_grey'
+						err && throw err
+						log 'Save OK!', 'green'
 
 ###
 task 'post', 'create new post', (options) ->
