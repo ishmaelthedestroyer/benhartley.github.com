@@ -4,7 +4,7 @@
   <title><![CDATA[hartley.io]]></title>
   <link href="http://benhartley.github.com/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-16T10:02:10+01:00</updated>
+  <updated>2012-04-19T15:09:15+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -166,7 +166,7 @@
 </span><span class='line'>sub vcl_recv <span class="o">{</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="c"># choose backend based on request</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">(</span>req.url ~ <span class="s2">&quot;\.(js|css|img)$&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span>req.url ~ <span class="s2">&quot;\.(js|css|jpg|png)$&quot;</span><span class="o">)</span> <span class="o">{</span>
 </span><span class='line'>      <span class="nb">set </span>req.backend <span class="o">=</span> nginx;
 </span><span class='line'>  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
 </span><span class='line'>      <span class="nb">set </span>req.backend <span class="o">=</span> node;
