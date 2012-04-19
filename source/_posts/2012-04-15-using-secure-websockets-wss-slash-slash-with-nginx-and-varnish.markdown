@@ -91,7 +91,7 @@ backend nginx {
 sub vcl_recv {
 
 	# choose backend based on request
-	if (req.url ~ "\.(js|css|img)$") {
+	if (req.url ~ "\.(js|css|jpg|png)$") {
 		set req.backend = nginx;
 	} else {
 		set req.backend = node;
