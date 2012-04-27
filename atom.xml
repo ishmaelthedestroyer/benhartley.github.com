@@ -4,7 +4,7 @@
   <title><![CDATA[hartley.io]]></title>
   <link href="http://benhartley.github.com/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-19T15:09:15+01:00</updated>
+  <updated>2012-04-27T11:44:30+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -173,7 +173,7 @@
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="c"># pipe websocket connections directly to node app</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span>req.http.Upgrade ~ <span class="s2">&quot;(?i)websocket&quot;</span> <span class="o">||</span> req.url ~ <span class="s2">&quot;^/socket.io/&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span>req.http.upgrade ~ <span class="s2">&quot;(?i)websocket&quot;</span> <span class="o">||</span> req.url ~ <span class="s2">&quot;^/socket.io/&quot;</span><span class="o">)</span> <span class="o">{</span>
 </span><span class='line'>          <span class="k">return</span> <span class="o">(</span>pipe<span class="o">)</span>;
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>

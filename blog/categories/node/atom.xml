@@ -4,7 +4,7 @@
   <title><![CDATA[Category: node | hartley.io]]></title>
   <link href="http://benhartley.github.com/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-19T15:09:15+01:00</updated>
+  <updated>2012-04-27T11:44:30+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -127,7 +127,7 @@ if (req.url ~ "\.(js|css|jpg|png)$") {
 }
 
 # pipe websocket connections directly to node app
-    if (req.http.Upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
+    if (req.http.upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
         return (pipe);
 }
 </code></pre>
