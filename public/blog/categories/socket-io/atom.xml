@@ -4,7 +4,7 @@
   <title><![CDATA[Category: socket.io | hartley.io]]></title>
   <link href="http://benhartley.github.com/blog/categories/socket-io/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-04-16T10:02:10+01:00</updated>
+  <updated>2012-04-27T11:44:06+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -120,14 +120,14 @@ TIMEOUTclose = 0
 <p>sub vcl_recv {</p>
 
 <pre><code># choose backend based on request
-if (req.url ~ "\.(js|css|img)$") {
+if (req.url ~ "\.(js|css|jpg|png)$") {
     set req.backend = nginx;
 } else {
     set req.backend = node;
 }
 
 # pipe websocket connections directly to node app
-    if (req.http.Upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
+    if (req.http.upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
         return (pipe);
 }
 </code></pre>

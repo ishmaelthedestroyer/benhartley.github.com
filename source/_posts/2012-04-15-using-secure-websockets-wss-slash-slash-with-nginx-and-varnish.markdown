@@ -98,7 +98,7 @@ sub vcl_recv {
 	}
 
 	# pipe websocket connections directly to node app
-		if (req.http.Upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
+		if (req.http.upgrade ~ "(?i)websocket" || req.url ~ "^/socket.io/") {
 			return (pipe);
 	}
 
