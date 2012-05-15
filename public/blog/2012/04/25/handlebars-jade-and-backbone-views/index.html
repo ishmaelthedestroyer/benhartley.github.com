@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Handlebars, Jade and Backbone views - hartley.io</title>
+  <meta name="author" content="Ben Hartley">
+
+  
+  <meta name="description" content="How to precompile Handlebars templates written in Jade for use in a Backbone application Handlebars intro If you&#8217;re using Backbone, you&#8217; &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="hartley.io" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3008341-10']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">hartley.io</a></h1>
+  
+    <h2>coffeescript, backbone, node + related technologies</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:benhartley.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Handlebars, Jade and Backbone views</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-25T16:47:00+01:00" pubdate data-updated="true">Apr 25<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>How to precompile Handlebars templates written in Jade for use in a Backbone application<!-- more --></p>
+
+<h2>Handlebars intro</h2>
+
+<p>If you&#8217;re using Backbone, you&#8217;re probably using a templating engine to render your views. My engine of choice at the moment is <a href="http://handlebarsjs.com/">Handlebars</a> because it combines a simple, familiar syntax with the ability to precompile templates. Precompiling our templates allows for a two-fold speed increase, since we only have to include the smaller handlebars.runtime.min.js file (~2KB) instead of the whole library (~20KB) and our templates are no longer compiled on the fly in our Backbone view. However, if you want to precompile your templates, you&#8217;re going to need some kind of build process. In steps <a href="http://coffeescript.org/#cake">Cake</a>&#8230;</p>
+
+<h2>Coffee and Cake</h2>
+
+<p>Cake allows you to write custom build tasks in coffeescript, so you can create a series of tasks for your common build tasks - e.g. compiling coffeescript to javascript and, of course, compiling your Handlebars templates. Here&#8217;s a simple cake task that compiles all the templates in a directory to a single js file (templates.js):</p>
+
+<figure class='code'><figcaption><span>Precompiling Handlebars templates with Cake</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='coffeescript'><span class='line'><span class="nx">task</span> <span class="s1">&#39;handlebars:compile&#39;</span><span class="p">,</span> <span class="s1">&#39;compile Handlebars templates&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="s1">&#39;handlebars src/html/* -f www/js/templates.js&#39;</span><span class="p">,</span> <span class="nf">(err, stdout, stderr) -&gt;</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="o">&amp;&amp;</span> <span class="k">throw</span> <span class="nx">err</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Handlebars compiled!&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now all we have to do is include templates.js in our app, and our compiled templates will be available at Handlebars.templates[template_name]. So, a very simple Backbone view might appear as follows:</p>
+
+<figure class='code'><figcaption><span>Minimum-viable Backbone view</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='coffeescript'><span class='line'><span class="k">class</span> <span class="nx">ViewName</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+</span><span class='line'>  <span class="nv">initialize : </span><span class="o">=&gt;</span>
+</span><span class='line'>      <span class="nx">@render</span><span class="p">()</span>
+</span><span class='line'>  <span class="nv">render : </span><span class="o">=&gt;</span>
+</span><span class='line'>      <span class="vi">@el.innerHTML = </span><span class="nx">Handlebars</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="s1">&#39;template.html&#39;</span><span class="p">]</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is great - we&#8217;ve got an easy, and more importantly, super-fast way of rendering our Backbone views. But what if we could make it even easier?</p>
+
+<h2>Never write HTML again</h2>
+
+<p>Handlebars is cool, but used in it&#8217;s most simplistic way, it still means we have to write HTML, which, let&#8217;s face it, isn&#8217;t much fun. A typical Handlebars template might appear as below. (Note, in all the Handlebars examples below, I&#8217;ve used single curly braces to enclose variables, as using double braces causes problems with rendering. You should use double braces in your code.):</p>
+
+<figure class='code'><figcaption><span>Handlebars in HTML</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;our_div&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>{handlebars_data}<span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It&#8217;s still a mess of angular brackets and opening / closing tags. <a href="https://github.com/visionmedia/jade">Jade</a> is a neat little language that compiles to HTML, thus rescuing us from all this. Consider this simple form:</p>
+
+<figure class='code'><figcaption><span>Jade template</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='jade'><span class='line'><span class="nt">form</span><span class="nf">#some_id</span>(<span class="na">action=</span><span class="s">&#39;&#39;</span>)
+</span><span class='line'>  <span class="nt">p</span>
+</span><span class='line'>      <span class="nt">label</span><span class="nc">.inline</span>(<span class="na">for=</span><span class="s">&#39;the_input&#39;</span>) Label for input
+</span><span class='line'>      <span class="nt">input</span>(<span class="na">type=</span><span class="s">&#39;text&#39;</span><span class="err">,</span> <span class="na">name=</span><span class="s">&#39;the_input&#39;</span><span class="err">,</span> <span class="na">placeholder=</span><span class="s">&#39;Enter value here&#39;</span>)
+</span><span class='line'>  <span class="nt">p:</span> input(type=&#39;submit&#39;, value=&#39;Submit&#39;)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8230; which compiles to:</p>
+
+<figure class='code'><figcaption><span>Compiled HTML</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;some_id&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;label</span> <span class="na">class=</span><span class="s">&quot;inline&quot;</span> <span class="na">for=</span><span class="s">&quot;the_input&quot;</span><span class="nt">&gt;</span>Label for input<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;the_input&quot;</span> <span class="na">placeholder=</span><span class="s">&quot;Enter value here&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;p&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Handlebars templates written in Jade</h2>
+
+<p>Even in the small example above, there&#8217;s noticably less work involved in typing out the Jade version. In a large project, this really adds up, so if you&#8217;re not using Jade, you should be. So what if we add another step to our build process that takes a template written in Jade, compiles it to HTML, then converts that HTML into a precompiled Handlebars template? Then we can have templates that look like below:</p>
+
+<figure class='code'><figcaption><span>Handlebars template written in Jade</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='jade'><span class='line'><span class="nt">ul</span>
+</span><span class='line'>  <span class="nt">li</span> {some_value} /* Remember - use double curly-braces in your templates */
+</span><span class='line'>  <span class="nt">li</span> {some_other_value}
+</span><span class='line'>  <span class="nt">li</span> {some_value}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8230; and we end up with ready-to-use HTML templates for use in our Backbone app. Again, in steps Cake, where we can chain tasks together using &#8220;invoke&#8221;.</p>
+
+<figure class='code'><figcaption><span>Two-step build process</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='coffeescript'><span class='line'><span class="nx">task</span> <span class="s1">&#39;jade:compile&#39;</span><span class="p">,</span> <span class="s1">&#39;compile jade templates from /src/jade to /src/html&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="s1">&#39;jade -O src/html/ src/jade/*&#39;</span><span class="p">,</span> <span class="nf">(err, stdout, stderr) -&gt;</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="o">&amp;&amp;</span> <span class="k">throw</span> <span class="nx">err</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Jade templates compiled!&#39;</span>
+</span><span class='line'>      <span class="nx">invoke</span> <span class="s1">&#39;handlebars:compile&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">task</span> <span class="s1">&#39;handlebars:compile&#39;</span><span class="p">,</span> <span class="s1">&#39;compile Handlebars templates&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="s1">&#39;handlebars src/html/* -f www/js/templates.js&#39;</span><span class="p">,</span> <span class="nf">(err, stdout, stderr) -&gt;</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="o">&amp;&amp;</span> <span class="k">throw</span> <span class="nx">err</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Handlebars compiled!&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when one task finishes successfully, the next task is called and we can have have a more complicated multi-stage build process.</p>
+
+<h2>Summary</h2>
+
+<p>Using Cake, we can chain together multiple build tasks to combine different tools that help speed up app development.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ben Hartley</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-25T16:47:00+01:00" pubdate data-updated="true">Apr 25<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/backbone/'>backbone</a>, <a class='category' href='/blog/categories/cake/'>cake</a>, <a class='category' href='/blog/categories/coffeescript/'>coffeescript</a>, <a class='category' href='/blog/categories/handlebars/'>handlebars</a>, <a class='category' href='/blog/categories/jade/'>jade</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views/" data-via="" data-counturl="http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/14/using-secure-websockets-wss-slash-slash-with-nginx-and-varnish/" title="Previous Post: Using secure websockets (wss://) with nginx and varnish">&laquo; Using secure websockets (wss://) with nginx and varnish</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I'm a developer living and working in London. I founded <a href="http://chaffin.ch/" target="_blank">Chaffinch</a> in 2006.</p>
+  <p>Get in touch: <a href="mailto:ben@hartley.io">ben@hartley.io</a>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/04/25/handlebars-jade-and-backbone-views/">Handlebars, Jade and Backbone views</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/14/using-secure-websockets-wss-slash-slash-with-nginx-and-varnish/">Using secure websockets (wss://) with nginx and varnish</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Ben Hartley -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hartleyio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views/';
+        var disqus_url = 'http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

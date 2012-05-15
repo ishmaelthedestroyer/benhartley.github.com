@@ -4,7 +4,6 @@ title: "Handlebars, Jade and Backbone views"
 date: 2012-04-25 16:47
 comments: true
 categories: [backbone, handlebars, jade, coffeescript, cake]
-published: false
 ---
 
 How to precompile Handlebars templates written in Jade for use in a Backbone application<!-- more -->
@@ -16,7 +15,7 @@ If you're using Backbone, you're probably using a templating engine to render yo
 
 ## Coffee and Cake
 
-Cake allows you to write custom build tasks in coffeescript, so you can create a series of tasks for your common build tasks - e.g. compiling coffeescript to javascript and, of course, compiling your Handlebars templates! Here's a simple cake task that compiles all the templates in a directory to a single js file:
+Cake allows you to write custom build tasks in coffeescript, so you can create a series of tasks for your common build tasks - e.g. compiling coffeescript to javascript and, of course, compiling your Handlebars templates. Here's a simple cake task that compiles all the templates in a directory to a single js file (templates.js):
 
 ``` coffeescript Precompiling Handlebars templates with Cake
 task 'handlebars:compile', 'compile Handlebars templates', ->
@@ -25,7 +24,7 @@ task 'handlebars:compile', 'compile Handlebars templates', ->
 		console.log 'Handlebars compiled!'
 ```
 
-Now all we have to do is include templates.js in our app, and the compiled template will be available at Handlebars.templates[template_name]. So, a very simple Backbone view might appear as follows:
+Now all we have to do is include templates.js in our app, and our compiled templates will be available at Handlebars.templates[template_name]. So, a very simple Backbone view might appear as follows:
 
 ``` coffeescript Minimum-viable Backbone view
 class ViewName extends Backbone.View
@@ -35,21 +34,21 @@ class ViewName extends Backbone.View
 		@el.innerHTML = Handlebars.templates['template.html'] @model.toJSON()
 ```
 
-This is great - we've got an easy, and more importantly, super-fast way of rendering our Backboen views. But what if we could make it even easier?
+This is great - we've got an easy, and more importantly, super-fast way of rendering our Backbone views. But what if we could make it even easier?
 
 ## Never write HTML again
 
-Handlebars is cool, but used in it's most simplistic way, it still means we have to write HTML, which, let's face it, isn't much fun. A typical Handlebars template might look like:
+Handlebars is cool, but used in it's most simplistic way, it still means we have to write HTML, which, let's face it, isn't much fun. A typical Handlebars template might appear as below. (Note, in all the Handlebars examples below, I've used single curly braces to enclose variables, as using double braces causes problems with rendering. You should use double braces in your code.):
 
 ``` html Handlebars in HTML
 <div id="our_div">
-	<p>{{handlebars_data}}</p>
+	<p>{handlebars_data}</p>
 </div>
 ```
 
-It's still a mess of angualr brackets and opening / closing tags. [Jade](https://github.com/visionmedia/jade) is a neat little language that compiles to HTML, thus rescuing us from all this. Consider this simple form:
+It's still a mess of angular brackets and opening / closing tags. [Jade](https://github.com/visionmedia/jade) is a neat little language that compiles to HTML, thus rescuing us from all this. Consider this simple form:
 
-``` jade
+``` jade Jade template
 form#some_id(action='')
 	p
 		label.inline(for='the_input') Label for input
@@ -59,7 +58,7 @@ form#some_id(action='')
 
 ... which compiles to:
 
-``` html
+``` html Compiled HTML
 <form id="some_id" action="">
 	<p>
 		<label class="inline" for="the_input">Label for input</label>
@@ -69,5 +68,34 @@ form#some_id(action='')
 </form>
 ```
 
-Even in this small example, there's noticably less work involved in typing out the Jade version. In a large project, this really adds up, so if you're not using Jade, you should be.
+## Handlebars templates written in Jade
 
+Even in the small example above, there's noticably less work involved in typing out the Jade version. In a large project, this really adds up, so if you're not using Jade, you should be. So what if we add another step to our build process that takes a template written in Jade, compiles it to HTML, then converts that HTML into a precompiled Handlebars template? Then we can have templates that look like below:
+
+``` jade Handlebars template written in Jade
+ul
+	li {some_value} /* Remember - use double curly-braces in your templates */
+	li {some_other_value}
+	li {some_value}
+```
+
+... and we end up with ready-to-use HTML templates for use in our Backbone app. Again, in steps Cake, where we can chain tasks together using "invoke".
+
+``` coffeescript Two-step build process
+task 'jade:compile', 'compile jade templates from /src/jade to /src/html', ->
+	exec 'jade -O src/html/ src/jade/*', (err, stdout, stderr) ->
+		err && throw err
+		console.log 'Jade templates compiled!'
+		invoke 'handlebars:compile'
+
+task 'handlebars:compile', 'compile Handlebars templates', ->
+	exec 'handlebars src/html/* -f www/js/templates.js', (err, stdout, stderr) ->
+		err && throw err
+		console.log 'Handlebars compiled!'
+```
+
+Now when one task finishes successfully, the next task is called and we can have have a more complicated multi-stage build process.
+
+## Summary
+
+Using Cake, we can chain together multiple build tasks to combine different tools that help speed up app development.
