@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: backbone | hartley.io]]></title>
+  <link href="http://benhartley.github.com/blog/categories/backbone/atom.xml" rel="self"/>
+  <link href="http://benhartley.github.com/"/>
+  <updated>2012-05-15T17:56:00+01:00</updated>
+  <id>http://benhartley.github.com/</id>
+  <author>
+    <name><![CDATA[Ben Hartley]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Handlebars, Jade and Backbone views]]></title>
+    <link href="http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views/"/>
+    <updated>2012-04-25T16:47:00+01:00</updated>
+    <id>http://benhartley.github.com/blog/2012/04/25/handlebars-jade-and-backbone-views</id>
+    <content type="html"><![CDATA[<p>How to precompile Handlebars templates written in Jade for use in a Backbone application<!-- more --></p>
+
+<h2>Handlebars intro</h2>
+
+<p>If you're using Backbone, you're probably using a templating engine to render your views. My engine of choice at the moment is <a href="http://handlebarsjs.com/">Handlebars</a> because it combines a simple, familiar syntax with the ability to precompile templates. Precompiling our templates allows for a two-fold speed increase, since we only have to include the smaller handlebars.runtime.min.js file (~2KB) instead of the whole library (~20KB) and our templates are no longer compiled on the fly in our Backbone view. However, if you want to precompile your templates, you're going to need some kind of build process. In steps <a href="http://coffeescript.org/#cake">Cake</a>...</p>
+
+<h2>Coffee and Cake</h2>
+
+<p>Cake allows you to write custom build tasks in coffeescript, so you can create a series of tasks for your common build tasks - e.g. compiling coffeescript to javascript and, of course, compiling your Handlebars templates. Here's a simple cake task that compiles all the templates in a directory to a single js file (templates.js):</p>
+
+<p>``` coffeescript Precompiling Handlebars templates with Cake
+task 'handlebars:compile', 'compile Handlebars templates', -></p>
+
+<pre><code>exec 'handlebars src/html/* -f www/js/templates.js', (err, stdout, stderr) -&gt;
+    err &amp;&amp; throw err
+    console.log 'Handlebars compiled!'
+</code></pre>
+
+<p>```</p>
+
+<p>Now all we have to do is include templates.js in our app, and our compiled templates will be available at Handlebars.templates[template_name]. So, a very simple Backbone view might appear as follows:</p>
+
+<p>``` coffeescript Minimum-viable Backbone view
+class ViewName extends Backbone.View</p>
+
+<pre><code>initialize : =&gt;
+    @render()
+render : =&gt;
+    @el.innerHTML = Handlebars.templates['template.html'] @model.toJSON()
+</code></pre>
+
+<p>```</p>
+
+<p>This is great - we've got an easy, and more importantly, super-fast way of rendering our Backbone views. But what if we could make it even easier?</p>
+
+<h2>Never write HTML again</h2>
+
+<p>Handlebars is cool, but used in it's most simplistic way, it still means we have to write HTML, which, let's face it, isn't much fun. A typical Handlebars template might appear as below. (Note, in all the Handlebars examples below, I've used single curly braces to enclose variables, as using double braces causes problems with rendering. You should use double braces in your code.):</p>
+
+<p>``` html Handlebars in HTML</p>
+
+<div id="our_div">
+    <p>{handlebars_data}</p>
+</div>
+
+
+<p>```</p>
+
+<p>It's still a mess of angular brackets and opening / closing tags. <a href="https://github.com/visionmedia/jade">Jade</a> is a neat little language that compiles to HTML, thus rescuing us from all this. Consider this simple form:</p>
+
+<p>``` jade Jade template
+form#some_id(action='')</p>
+
+<pre><code>p
+    label.inline(for='the_input') Label for input
+    input(type='text', name='the_input', placeholder='Enter value here')
+p: input(type='submit', value='Submit')
+</code></pre>
+
+<p>```</p>
+
+<p>... which compiles to:</p>
+
+<p>``` html Compiled HTML
+<form id="some_id" action=""></p>
+
+<pre><code>&lt;p&gt;
+    &lt;label class="inline" for="the_input"&gt;Label for input&lt;/label&gt;
+    &lt;input type="text" name="the_input" placeholder="Enter value here" /&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;input type="submit" value="Submit" /&gt;&lt;/p&gt;
+</code></pre>
+
+<p></form>
+```</p>
+
+<h2>Handlebars templates written in Jade</h2>
+
+<p>Even in the small example above, there's noticably less work involved in typing out the Jade version. In a large project, this really adds up, so if you're not using Jade, you should be. So what if we add another step to our build process that takes a template written in Jade, compiles it to HTML, then converts that HTML into a precompiled Handlebars template? Then we can have templates that look like below:</p>
+
+<p>``` jade Handlebars template written in Jade
+ul</p>
+
+<pre><code>li {some_value} /* Remember - use double curly-braces in your templates */
+li {some_other_value}
+li {some_value}
+</code></pre>
+
+<p>```</p>
+
+<p>... and we end up with ready-to-use HTML templates for use in our Backbone app. Again, in steps Cake, where we can chain tasks together using "invoke".</p>
+
+<p>``` coffeescript Two-step build process
+task 'jade:compile', 'compile jade templates from /src/jade to /src/html', -></p>
+
+<pre><code>exec 'jade -O src/html/ src/jade/*', (err, stdout, stderr) -&gt;
+    err &amp;&amp; throw err
+    console.log 'Jade templates compiled!'
+    invoke 'handlebars:compile'
+</code></pre>
+
+<p>task 'handlebars:compile', 'compile Handlebars templates', -></p>
+
+<pre><code>exec 'handlebars src/html/* -f www/js/templates.js', (err, stdout, stderr) -&gt;
+    err &amp;&amp; throw err
+    console.log 'Handlebars compiled!'
+</code></pre>
+
+<p>```</p>
+
+<p>Now when one task finishes successfully, the next task is called and we can have have a more complicated multi-stage build process.</p>
+
+<h2>Summary</h2>
+
+<p>Using Cake, we can chain together multiple build tasks to combine different tools that help speed up app development.</p>
+]]></content>
+  </entry>
+  
+</feed>
