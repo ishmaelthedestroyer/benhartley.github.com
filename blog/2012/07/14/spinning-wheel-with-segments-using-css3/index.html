@@ -1,0 +1,393 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spinning wheel with segments using Stylus and Nib (CSS3) - hartley.io</title>
+  <meta name="author" content="Ben Hartley">
+
+  
+  <meta name="description" content="Use CSS3 transitions and a clever CSS hack to create a spinning wheel made up of individual segments Demo (view source on GitHub) Quick and dirty &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benhartley.github.com/blog/2012/07/14/spinning-wheel-with-segments-using-css3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="hartley.io" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3008341-10']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">hartley.io</a></h1>
+  
+    <h2>coffeescript, backbone, node + related technologies</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:benhartley.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spinning wheel with segments using Stylus and Nib (CSS3)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-14T12:16:00+01:00" pubdate data-updated="true">Jul 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Use CSS3 transitions and a clever CSS hack to create a spinning wheel made up of individual segments<!-- more --></p>
+
+<h2>Demo (<a href="https://github.com/benhartley/wheel-demo">view source on GitHub</a>)</h2>
+
+<p>Quick and dirty iframe:</p>
+
+<iframe style="width:728px; height:470px;" src="http://d2uqigvzon6qhz.cloudfront.net/"></iframe>
+
+
+<h2>Intro</h2>
+
+<p>I&#8217;ve been working on a fun project for Monotype this week to demonstrate their <a href="http://webfonts.fonts.com">Web Fonts</a> service, using CSS3 to create a spinning wheel. It&#8217;s not quite finished, so excuse any glaring bugs, but I thought I&#8217;d share how it&#8217;s made. The whole project only uses a handful of images, the segments of the wheel are individual divs, the text is all live-text. I could have used even fewer images if I&#8217;d had more time on it, but I digress&#8230; This write-up glosses-over a lot of the detail, so if you really want to know how it works, you&#8217;re best off looking through the source code, however, hopefully you&#8217;ll find both helpful.</p>
+
+<h2>Power of Stylus</h2>
+
+<p>This project was made infinitely easier by using <a href="http://learnboost.github.com/stylus/">Stylus</a> and <a href="http://visionmedia.github.com/nib/">Nib</a> to create the CSS. Stylus is a simple language that compiles to CSS (similar to SASS or Less), and Nib is a library for Stylus that enables you to write way less code. You can view the whole <code>.styl</code> file in the <a href="https://github.com/benhartley/wheel-demo">GitHub repo</a>, and I&#8217;ll be using simplified excerpts here too. Unfortunately, Pygments doesn&#8217;t seem to have Stylus syntax highlighting, so I&#8217;ve used Ruby, thus the code snippets may have some weird highlighting&#8230;</p>
+
+<p>At the top of <code>/src/styl/style.styl</code>, there are two lines:</p>
+
+<figure class='code'><figcaption><span>Stylus setup</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@import</span> <span class="n">nib</span>
+</span><span class='line'><span class="n">global</span><span class="o">-</span><span class="n">reset</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first one means Nib will be used when compiling our CSS - more on that later. The second means Eric Meyer&#8217;s global browser reset CSS rules will be automatically added to our compiled CSS file. How easy is that?</p>
+
+<h2>The Triangles</h2>
+
+<p>On to the CSS hack I mentioned earlier. This came to my attention via <a href="http://jonrohan.me/guide/css/creating-triangles-in-css/">Jon Rohan</a>, and looks like it was created originally by, him again, Eric Meyer. For our purposes, the triangles are created as follows:</p>
+
+<figure class='code'><figcaption><span>Triangular divs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">triangle</span>
+</span><span class='line'>    <span class="n">border</span><span class="o">-</span><span class="n">style</span> <span class="n">solid</span>
+</span><span class='line'>    <span class="n">border</span><span class="o">-</span><span class="n">width</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">250</span><span class="n">px</span> <span class="mi">800</span><span class="n">px</span>
+</span><span class='line'>    <span class="n">border</span><span class="o">-</span><span class="n">color</span> <span class="n">transparent</span>
+</span><span class='line'>    <span class="n">width</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="n">height</span> <span class="mi">0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All we then need to do is add a colour to the bottom-border and we have a triangle (this example has been scaled down):</p>
+
+<div style="border-style:solid;border-width:0 0 125px 400px;border-color:transparent;border-bottom-color:#291f33;width:0;height:0;margin-bottom:30px;"></div>
+
+
+<p>Now, all we need to do is create several of these triangles and rotate them and we have&#8230;</p>
+
+<h2>The Wheel</h2>
+
+<p>The <code>#wheel</code> in my project is made up of 20 <code>.segment</code> divs, but you can use as many as you like. Rather than having to calculate the rotation for each segment, we can use a function in Stylus to do the job for us. As there are 20 segments (numbered 0 to 19), the rotation for each segment will be its number multiplied by 18 (18 = 360º divided by 20 segments).</p>
+
+<figure class='code'><figcaption><span>Rotating the segments</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">num_segs</span> <span class="o">=</span> <span class="mi">20</span>
+</span><span class='line'><span class="n">rotation</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">/</span> <span class="n">num_segs</span>
+</span><span class='line'><span class="n">rotate_seg</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">segment</span> <span class="o">*</span> <span class="n">rotation</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we have the <code>rotate_seg</code> function, we can loop through our segment numbers, pass them to the function and it will return how much we need to rotate that segment to make the wheel. Note 1: Nib enables us to just use <code>transform</code> - no vendor prefixes in sight! Note 2: the line beginning <code>#seg</code> is not a comment - the syntax highlighter thinks it is though&#8230;</p>
+
+<figure class='code'><figcaption><span>Loop through segments and apply rotation</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">for</span> <span class="n">num</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="mi">19</span>
+</span><span class='line'>    <span class="c1">#seg_{num}</span>
+</span><span class='line'>        <span class="n">transform</span> <span class="n">rotate</span><span class="p">(</span><span class="n">rotate_seg</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we now set <code>transform-origin</code> to <code>bottom left</code>, then our segments will fan out into a circle.</p>
+
+<p>While we&#8217;re looping through the segments, we can also use a function to apply a colour to each one of our triangular divs. In my project, the colours were part of the design, so I used a hash that mapped a colour to a segment number. However, with Stylus you could also apply one of the many colour functions to create a cool effect.</p>
+
+<figure class='code'><figcaption><span>Apply a colour to each segment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span> <span class="c1">#fcf0e0) (1 #fc6d58) (2 #3f9149) (3 #5cd0e0) (4 #fcd925) (5 #03b845) (6 #8f0f80) (7 #fc35aa) (8 #b5f032) (9 #fc6d58) (10 #1cd9a6) (11 #def01f) (12 #fca932) (13 #3f659a) (14 #e2d62c) (15 #ea1c53) (16 #5cd0e0) (17 #fca932) (18 #1cd9a6) (19 #c3d49e)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">segment_color</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">color</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="k">if</span> <span class="n">color</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="n">segment</span> <span class="k">for</span> <span class="n">color</span> <span class="k">in</span> <span class="n">colors</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="n">num</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="mi">19</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">triangle</span>
+</span><span class='line'>        <span class="n">border</span><span class="o">-</span><span class="n">bottom</span><span class="o">-</span><span class="n">color</span> <span class="n">segment_color</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Make it Spin</h2>
+
+<p>So, now we have a wheel made up of individual segments. But surely the coolest thing is that we can make it spin, and add a custom easing effect to make the spin feel more natural. Given the odd construction of our wheel, it took a bit of fiddling around to find the centre-point for the rotation. You may want to tweak these numbers if you change any features o the wheel. Again, <code>#wheel</code> here is not a comment but a CSS declaration.</p>
+
+<figure class='code'><figcaption><span>Finding the centre + setting rotation speed</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#wheel</span>
+</span><span class='line'>    <span class="n">transform</span><span class="o">-</span><span class="n">origin</span> <span class="mi">0</span><span class="o">%</span> <span class="mi">17</span><span class="o">%</span>
+</span><span class='line'>    <span class="n">transition</span> <span class="n">all</span> <span class="mi">5</span><span class="n">s</span> <span class="n">cubic</span><span class="o">-</span><span class="n">bezier</span><span class="p">(</span><span class="o">.</span><span class="mi">16</span><span class="p">,</span><span class="o">.</span><span class="mi">63</span><span class="p">,</span><span class="o">.</span><span class="mi">4</span><span class="p">,</span><span class="o">.</span><span class="mi">99</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice the cubic-bezier curve defined in the easing function of the transition. Read from left to right, the transition declaration says: for all changes to the <code>#wheel</code> div, make them last 5 seconds, and use the following curve for easing. The curve starts off almost vertical, then slows sharply to create the effect of a wheel spinning, then gradually slowing down. I use cubic-bezier.com to create curves for easing functions, and you can <a href="http://cubic-bezier.com/#.16,.63,.4,.99">view this particular curve here</a>.</p>
+
+<p>Now, when we change the rotation of the wheel, it will spin for five seconds, and then gracefully slow down to the desired position. We change the rotation by adding one of several classes to <code>#wheel</code> and we generate those classes using Stylus:</p>
+
+<figure class='code'><figcaption><span>Rotation classes for the wheel</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rotate_wheel</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">even</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">rotate_seg</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span> <span class="o">-</span> <span class="mi">181</span><span class="n">deg</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>        <span class="n">rotate_seg</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span> <span class="o">+</span> <span class="mi">179</span><span class="n">deg</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="n">num</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="mi">19</span>
+</span><span class='line'>    <span class="o">&amp;.</span><span class="n">show_</span><span class="p">{</span><span class="n">num</span><span class="p">}</span>
+</span><span class='line'>        <span class="n">transform</span> <span class="n">rotate</span><span class="p">(</span><span class="n">rotate_wheel</span><span class="p">(</span><span class="mi">20</span> <span class="o">-</span> <span class="n">num</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, to show segment 9 for example, we just have to add <code>.show_9</code> to the <code>#wheel</code> div. The <code>rotate_wheel</code> function alternates between clockwise and anti-clockwise rotations for even and odd segments to avoid less interesting transitions (e.g. spinning from segment 4 to 5 includes a whole spin, rather than moving a single place).</p>
+
+<h2>Summary</h2>
+
+<p>Stylus and Nib really came into their own for me during this project. It would have been fairly boring and laborious creating the wheel using regular CSS, but as you can see above, it didn&#8217;t take much code at all.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ben Hartley</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-14T12:16:00+01:00" pubdate data-updated="true">Jul 14<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/css3/'>css3</a>, <a class='category' href='/blog/categories/nib/'>nib</a>, <a class='category' href='/blog/categories/stylus/'>stylus</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://benhartley.github.com/blog/2012/07/14/spinning-wheel-with-segments-using-css3/" data-via="" data-counturl="http://benhartley.github.com/blog/2012/07/14/spinning-wheel-with-segments-using-css3/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/25/handlebars-jade-and-backbone-views/" title="Previous Post: Handlebars, Jade and Backbone views">&laquo; Handlebars, Jade and Backbone views</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I'm a developer living and working in London. I founded <a href="http://chaffin.ch/" target="_blank">Chaffinch</a> in 2006.</p>
+  <p>Get in touch: <a href="mailto:ben@hartley.io">ben@hartley.io</a>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/14/spinning-wheel-with-segments-using-css3/">Spinning wheel with segments using Stylus and Nib (CSS3)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/25/handlebars-jade-and-backbone-views/">Handlebars, Jade and Backbone views</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/14/using-secure-websockets-wss-slash-slash-with-nginx-and-varnish/">Using secure websockets (wss://) with nginx and varnish</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Ben Hartley -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hartleyio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benhartley.github.com/blog/2012/07/14/spinning-wheel-with-segments-using-css3/';
+        var disqus_url = 'http://benhartley.github.com/blog/2012/07/14/spinning-wheel-with-segments-using-css3/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
