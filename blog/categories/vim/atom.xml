@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: vim | hartley.io]]></title>
+  <link href="http://benhartley.github.com/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://benhartley.github.com/"/>
+  <updated>2012-07-21T12:46:30+01:00</updated>
+  <id>http://benhartley.github.com/</id>
+  <author>
+    <name><![CDATA[Ben Hartley]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Search the web from Vim]]></title>
+    <link href="http://benhartley.github.com/blog/2012/07/21/search-the-web-from-vim/"/>
+    <updated>2012-07-21T11:12:00+01:00</updated>
+    <id>http://benhartley.github.com/blog/2012/07/21/search-the-web-from-vim</id>
+    <content type="html"><![CDATA[<p>Seamless web search - lose less focus<!-- more --></p>
+
+<h2>Laziness, Impatience...</h2>
+
+<p>90% of the time I switch context away from Vim, it's to load Chrome to search for something. In order to make this as seamless as possible, I've added a function to my .vimrc which brings up a prompt where I can enter my search terms, hit enter and it launches Chrome and searches the search engine of my choice with the entered text.</p>
+
+<p>I should note - this is for Chrome on OS X, however, it could be adapted to work on other platforms and with other browsers.</p>
+
+<p>``` vim Key mapping for search prompt
+function! Terms()</p>
+
+<pre><code>call inputsave()
+let searchterm = input('Search: ')
+call inputrestore()
+return searchterm
+</code></pre>
+
+<p>endfunction
+map © <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=Terms()<CR>'<CR><CR>
+```</p>
+
+<p>The above code maps <code>alt + g</code> to bring up the prompt, hitting enter then launches a Google search in Chrome. You needn't restrict yourself to just searching Google either - for <a href="https://duckduckgo.com/">DuckDuckGo</a> you can replace <code>https://google.com/search?q=</code> with <code>https://duckduckgo.com/?q=</code> or for <a href="https://blekko.com/">Blekko</a> you can use <code>https://blekko.com/ws/</code>.</p>
+
+<p>You can check out <a href="https://github.com/benhartley/dotfiles/blob/master/vimrc">my full .vimrc</a> on GitHub.</p>
+]]></content>
+  </entry>
+  
+</feed>

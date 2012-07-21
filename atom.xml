@@ -4,7 +4,7 @@
   <title><![CDATA[hartley.io]]></title>
   <link href="http://benhartley.github.com/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-07-15T16:44:29+01:00</updated>
+  <updated>2012-07-21T12:46:30+01:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -12,6 +12,42 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Search the web from Vim]]></title>
+    <link href="http://benhartley.github.com/blog/2012/07/21/search-the-web-from-vim/"/>
+    <updated>2012-07-21T11:12:00+01:00</updated>
+    <id>http://benhartley.github.com/blog/2012/07/21/search-the-web-from-vim</id>
+    <content type="html"><![CDATA[<p>Seamless web search - lose less focus<!-- more --></p>
+
+<h2>Laziness, Impatience&#8230;</h2>
+
+<p>90% of the time I switch context away from Vim, it&#8217;s to load Chrome to search for something. In order to make this as seamless as possible, I&#8217;ve added a function to my .vimrc which brings up a prompt where I can enter my search terms, hit enter and it launches Chrome and searches the search engine of my choice with the entered text.</p>
+
+<p>I should note - this is for Chrome on OS X, however, it could be adapted to work on other platforms and with other browsers.</p>
+
+<figure class='code'><figcaption><span>Key mapping for search prompt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">function</span><span class="p">!</span> Terms<span class="p">()</span>
+</span><span class='line'>  <span class="k">call</span> inputsave<span class="p">()</span>
+</span><span class='line'>  <span class="k">let</span> searchterm <span class="p">=</span> input<span class="p">(</span><span class="s1">&#39;Search: &#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">call</span> inputrestore<span class="p">()</span>
+</span><span class='line'>  <span class="k">return</span> searchterm
+</span><span class='line'><span class="k">endfunction</span>
+</span><span class='line'>map © <span class="p">&lt;</span>ESC<span class="p">&gt;</span>:<span class="p">!</span> <span class="sr">/usr/</span><span class="nb">bin</span><span class="sr">/open -a &quot;/</span>Applications<span class="sr">/Google Chrome.app&quot; &#39;https://google.com/</span>search?<span class="k">q</span><span class="p">=&lt;</span>C<span class="p">-</span>R<span class="p">&gt;=</span>Terms<span class="p">()&lt;</span>CR<span class="p">&gt;</span>&#39;<span class="p">&lt;</span>CR<span class="p">&gt;&lt;</span>CR<span class="p">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above code maps <code>alt + g</code> to bring up the prompt, hitting enter then launches a Google search in Chrome. You needn&#8217;t restrict yourself to just searching Google either - for <a href="https://duckduckgo.com/">DuckDuckGo</a> you can replace <code>https://google.com/search?q=</code> with <code>https://duckduckgo.com/?q=</code> or for <a href="https://blekko.com/">Blekko</a> you can use <code>https://blekko.com/ws/</code>.</p>
+
+<p>You can check out <a href="https://github.com/benhartley/dotfiles/blob/master/vimrc">my full .vimrc</a> on GitHub.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Spinning wheel with segments using Stylus and Nib (CSS3)]]></title>
