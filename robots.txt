@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://benhartley.github.com/sitemap.xml 

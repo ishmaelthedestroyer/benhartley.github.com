@@ -4,7 +4,7 @@
   <title><![CDATA[hartley.io]]></title>
   <link href="http://benhartley.github.com/atom.xml" rel="self"/>
   <link href="http://benhartley.github.com/"/>
-  <updated>2012-07-21T12:46:30+01:00</updated>
+  <updated>2013-02-11T15:16:08+00:00</updated>
   <id>http://benhartley.github.com/</id>
   <author>
     <name><![CDATA[Ben Hartley]]></name>
@@ -12,6 +12,53 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Web apps as first-class citizens in OS X: Fluid + Slate + Choosy]]></title>
+    <link href="http://benhartley.github.com/blog/2013/02/11/web-apps-as-first-class-citizens-in-os-x-fluid-slate-choosy/"/>
+    <updated>2013-02-11T06:47:00+00:00</updated>
+    <id>http://benhartley.github.com/blog/2013/02/11/web-apps-as-first-class-citizens-in-os-x-fluid-slate-choosy</id>
+    <content type="html"><![CDATA[<p>Promote the web apps you regularly use to first-class citizens in OS X using 3 simple utilities.<!-- more --></p>
+
+<h2>Fluid</h2>
+
+<p><a href="http://fluidapp.com/">Fluid</a> is a free app that lets you create a &#8220;native&#8221; version of a webapp - it&#8217;s essentially a stand-alone version of webkit for each web app which can then have its own Dock icon etc. If you aren&#8217;t already using it, I&#8217;ll leave you to experiment with it here.</p>
+
+<h2>Slate</h2>
+
+<p><a href="https://github.com/jigish/slate">Slate</a> is an insanely fully-featured window manager, and I encourage you to dive into it since it has way more features than anyone could ever need. The functionality we&#8217;re interested in for this post is assigning hotkeys to apps that are running, so your Fluid apps are only ever a couple of keystrokes away. No more alt-tabbing between them! Here&#8217;s a snippet from my <code>~/.slate</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>alias hotkey ctrl;cmd
+</span><span class='line'>bind b:${hotkey} focus 'Google Chrome'
+</span><span class='line'>bind i:${hotkey} focus 'iTerm'
+</span><span class='line'>bind m:${hotkey} focus 'Mail'
+</span><span class='line'>bind c:${hotkey} focus 'gCal'
+</span><span class='line'>bind f:${hotkey} focus 'Finder'
+</span><span class='line'>bind r:${hotkey} focus 'RTM'
+</span><span class='line'>bind t:${hotkey} focus 'iTunes'
+</span><span class='line'>bind d:${hotkey} focus 'Google Drive'
+</span><span class='line'>bind w:${hotkey} focus 'Workflowy'</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>You can have a look through the rest of the file in my <a href="https://github.com/benhartley/dotfiles">.dotfiles repo</a></em></p>
+
+<p>These config options specify a hotkey combination of <code>cmd</code> + <code>ctrl</code> and then assign different keys to different apps, e.g. <code>cmd</code> + <code>crtl</code> + <code>c</code> switches to Google Calendar.</p>
+
+<h2>Choosy</h2>
+
+<p>The final piece in this puzzle is <a href="http://www.choosyosx.com/">Choosy</a> - self-described as &#8220;a smarter default browser for OS X&#8221;. Choosy acts as a router for any links you click, anywhere in the O. Instead of them opening automatically in your default browser, Choosy lets you set rules, and open different &#8220;browsers&#8221; (or Fluid apps) depending on where the link points to. So if someone emails me a link to a story in Pivotal and I click that link, Choosy matches the URL to my Pivotal Fluid app and launches that instead of Chrome.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Search the web from Vim]]></title>
